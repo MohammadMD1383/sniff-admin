@@ -20,9 +20,6 @@ $json = [System.Convert]::ToBase64String(
         } | ConvertTo-Json)
     )
 )
-# handle errors and exceptions
-
-# data encryption
 
 try {   
     $result = (Invoke-WebRequest -Uri 'http://10.0.2.2:8000/report' -Method Post -Headers @{'Content-Type' = 'text/plain' } -Body $json).Content | ConvertFrom-Json
