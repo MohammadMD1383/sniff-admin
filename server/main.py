@@ -26,3 +26,21 @@ async def report(enc_data: Request):
 		f.write(report_json)
 	
 	return {"status": "success"}
+
+
+@app.get("/reports")
+async def reports(request: Request):
+	if request.client.host != '127.0.0.1':
+		return
+	
+	result = {}
+	_, directories, _ = next(os.walk("reports"))
+	
+	for d in directories:
+		_, _, files = next(os.walk(f"reports/{d}"))
+		
+		result[util.decode_path(d)] = []
+		for f in files:
+			result[util.decode_path(d)].append(util.read_json(f"reports/{d}/{f}"))
+	
+	return result
