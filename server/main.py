@@ -4,6 +4,7 @@ from base64 import urlsafe_b64decode
 from time import time
 
 from fastapi import FastAPI
+from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 
 import util
@@ -12,6 +13,13 @@ import util
 os.makedirs("reports", exist_ok=True)
 
 app = FastAPI()
+app.add_middleware(
+	CORSMiddleware,
+	allow_credentials=True,
+	allow_origins=["*"],
+	allow_methods=["*"],
+	allow_headers=["*"]
+)
 
 
 @app.post("/report")
@@ -41,6 +49,8 @@ async def reports(request: Request):
 		
 		result[util.decode_path(d)] = []
 		for f in files:
-			result[util.decode_path(d)].append(util.read_json(f"reports/{d}/{f}"))
+			j = util.read_json(f"reports/{d}/{f}")
+			j["servertime"] = int(f.split('.')[0])
+			result[util.decode_path(d)].append(j)
 	
 	return result
