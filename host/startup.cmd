@@ -1,0 +1,1 @@
+pwsh -ExecutionPolicy Unrestricted -File %LOCALAPPDATA%\reporterfiles\reporter.ps1
