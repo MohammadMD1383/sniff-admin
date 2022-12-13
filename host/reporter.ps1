@@ -3,7 +3,7 @@ $driveinfo = [System.IO.DriveInfo]::GetDrives() | Where-Object {
 } | Select-Object Name, AvailableFreeSpace, TotalSize
 $boottime = [System.DateTimeOffset]::new((Get-CimInstance win32_operatingsystem | Select-Object LastBootUpTime).LastBootUpTime).ToUnixTimeMilliseconds()
 $userinfo = whoami.exe
-$netinfo = Get-NetAdapterStatistics | Select-Object ReceivedBytes, SentBytes
+$netinfo = Get-NetAdapterStatistics | Select-Object InterfaceAlias, ReceivedBytes, SentBytes
 $ipinfo = Get-NetIPAddress | Select-Object IPAddress, InterfaceIndex, InterfaceAlias, AddressFamily
 $time = [System.DateTimeOffset]::new((Get-Date)).ToUnixTimeMilliseconds()
 # other needed things
@@ -17,12 +17,12 @@ $json = [System.Convert]::ToBase64String(
             netinfo   = $netinfo;
             ipinfo    = $ipinfo;
             time      = $time;
-        } | ConvertTo-Json)
+        } | ConvertTo-Json -EnumsAsStrings -Compress)
     )
 )
 
 try {   
-    $result = (Invoke-WebRequest -Uri 'http://10.0.2.2:8000/report' -Method Post -Headers @{'Content-Type' = 'text/plain' } -Body $json).Content | ConvertFrom-Json
+    $result = (Invoke-WebRequest -Uri 'http://192.168.122.1:8000/report' -Method Post -Headers @{'Content-Type' = 'text/plain' } -Body $json).Content | ConvertFrom-Json
     if ($result.status -ne "success") { throw }
 }
 catch {
