@@ -1,4 +1,7 @@
-$driveinfo = [System.IO.DriveInfo]::GetDrives() | Where-Object { 
+# wait 1 minute before getting report
+Start-Sleep -Seconds 60
+
+$driveinfo = [System.IO.DriveInfo]::GetDrives() | Where-Object {
     $_.DriveType -eq "Fixed" -and $_.IsReady -eq $true 
 } | Select-Object Name, AvailableFreeSpace, TotalSize
 $boottime = [System.DateTimeOffset]::new((Get-CimInstance win32_operatingsystem | Select-Object LastBootUpTime).LastBootUpTime).ToUnixTimeMilliseconds()
