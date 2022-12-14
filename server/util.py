@@ -13,3 +13,12 @@ def decode_path(path: str):
 def read_json(path: str):
 	with open(path) as file:
 		return json.load(file)
+
+
+def standardize_report(data: dict):
+	if isinstance(data["driveinfo"], dict):
+		data["driveinfo"] = [data["driveinfo"]]
+	if isinstance(data["ipinfo"], dict):
+		data["ipinfo"] = [data["ipinfo"]]
+	if isinstance(data["netinfo"], dict):
+		data["netinfo"] = [data["netinfo"]]

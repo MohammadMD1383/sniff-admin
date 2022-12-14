@@ -24,12 +24,16 @@ app.add_middleware(
 
 @app.post("/report")
 async def report(enc_data: Request):
+	time_now = int(time() * 1000)
 	data = json.loads(urlsafe_b64decode(await enc_data.body()).decode('utf8'))
+	
+	data["servertime"] = time_now
+	util.standardize_report(data)
+	
 	user_path = f"reports/{util.encode_path(data['userinfo'])}"
 	os.makedirs(user_path, exist_ok=True)
-	report_json = json.dumps(data, sort_keys=True, indent=4, separators=(',', ': '))
-	time_now = int(time() * 1000)
 	
+	report_json = json.dumps(data, sort_keys=True, indent=4, separators=(',', ': '))
 	with open(f'{user_path}/{time_now}.json', 'w') as f:
 		f.write(report_json)
 	
@@ -49,8 +53,6 @@ async def reports(request: Request):
 		
 		result[util.decode_path(d)] = []
 		for f in files:
-			j = util.read_json(f"reports/{d}/{f}")
-			j["servertime"] = int(f.split('.')[0])
-			result[util.decode_path(d)].append(j)
+			result[util.decode_path(d)].append(util.read_json(f"reports/{d}/{f}"))
 	
 	return result
